@@ -1,0 +1,57 @@
+﻿Sub crearNubeEtiquetas()
+On Error GoTo MensajeError
+ 
+Dim tamano As Integer
+Dim celda As Integer
+Dim indice As Integer
+Dim etiquetas() As String
+Dim importancia()
+Dim maxImportancia
+Dim minImportancia
+tamano = Selection.Count / 2
+ReDim etiquetas(1 To tamano) As String
+ReDim importancia(1 To tamano)
+ 
+celda = 1
+indice = 1
+ 
+For Each cell In Excel.Selection
+    If celda Mod 2 = 1 Then
+        listaEtiquetas = listaEtiquetas & cell.Value & ", "
+        etiquetas(indice) = cell.Value
+    Else
+        importancia(indice) = Val(cell.Value)
+ 
+        If importancia(indice) > maxImportancia Then
+            maxImportancia = importancia(indice)
+        End If
+ 
+        If importancia(indice) < minImportancia Then
+            minImportancia = importancia(indice)
+        End If
+ 
+        indice = indice + 1
+    End If
+ 
+    celda = celda + 1
+Next cell
+ 
+ 
+Range("D14").Select
+ActiveCell.Value = listaEtiquetas
+ActiveCell.Font.Size = 8
+inicio = 1
+ 
+For i = 1 To tamano
+    With ActiveCell.Characters(Start:=inicio, Length:=Len(etiquetas(i))).Font
+        .Size = 6 + Math.Round((importancia(i) - minImportancia) / (maxImportancia - minImportancia) * 14, 0)
+    End With
+ 
+    inicio = inicio + Len(etiquetas(i)) + 2
+Next i
+ 
+Exit Sub
+MensajeError:
+ 
+MsgBox "Necesita seleccionar una tabla de datos.", vbCritical + vbOKOnly
+End Sub
